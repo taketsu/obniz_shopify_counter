@@ -1,0 +1,111 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://unpkg.com/obniz@3.16.0/obniz.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div id="obniz-debug"></div>
+  <h3>Connect From Your Browser</h3>
+  <button class="btn btn-primary" id="on">LED ON</button>
+  <button class="btn btn-primary" id="off">LED OFF</button>
+  <div id="print"></div>
+
+  <div>
+    <input type="text" id="text" value="Hello World" />
+    <input type="text" id="number" value="300" />
+    <button class="btn btn-primary" id="showtime">Print on obniz</button>
+  </div>
+
+  <div>Demo Pin Assign</div>
+  <ul>
+    <li>io0: LED anode</li>
+    <li>io1: LED cathode</li>
+    <li>Switch State will be printed on browser</li>
+  </ul>
+
+  <script>
+    var obniz = new Obniz("");
+
+    obniz.onconnect = async function () {
+      // let light = obniz.wired("Keyestudio_TrafficLight", {
+      //   gnd: 0,
+      //   green: 1,
+      //   yellow: 2,
+      //   red: 3
+      // });
+      // Javascript Example
+      // var speaker = obniz.wired("Keyestudio_Buzzer", { signal: 0, vcc: 1, gnd: 2 });
+      const segment = obniz.wired("7SegmentLED_MAX7219", { clk: 0, cs: 1, din: 2, gnd: 3, vcc: 4 });
+      segment.init(1, 8); // 4桁のディスプレイを一つ接続
+      segment.setNumber(0, 0, 0, false); 
+      segment.setNumber(0, 1, "off", false); 
+      segment.setNumber(0, 2, "off", false); 
+      segment.setNumber(0, 3, "off", false); 
+      segment.setNumber(0, 4, "off", false); 
+      segment.setNumber(0, 5, "off", false); 
+      segment.setNumber(0, 6, "off", false); 
+      segment.setNumber(0, 7, "off", false); 
+
+
+      obniz.display.clear();
+      obniz.display.print("Hello World");
+
+      obniz.switch.onchange = function (state) {
+        $("#print").text(state);
+        obniz.display.clear();
+        obniz.display.print(state);
+      };
+
+      $("#showtime").on("click", function () {
+        obniz.display.clear();
+        obniz.display.print($("#text").val());
+      });
+
+      $("#on").click(function () {
+        segment.setNumber(0, 0, 5, false); 
+        segment.setNumber(0, 1, 1, false); 
+        segment.setNumber(0, 2, 0, false); 
+        segment.setNumber(0, 3, 0, false); 
+        segment.setNumber(0, 4, 0, false); 
+        segment.setNumber(0, 5, 0, false); 
+        segment.setNumber(0, 6, 0, false); 
+        segment.setNumber(0, 7, 0, false); 
+
+        // speaker.play(200) // 1000 Hz
+        // await obniz.wait(1000);
+        // speaker.stop();
+        // light.single("red");
+        // obniz.display.clear();
+        // obniz.display.print("ON");
+      });
+
+      $("#off").click(function () {
+        const num = Number($("#number").val());
+        for (let n = 0; n <= num; n++) {
+          const strNum = ("xxxxxxxx" + n).slice(-8);
+          segment.setNumber(0, 7, strNum[0] == "x" ? "off" : strNum[0], false); 
+          segment.setNumber(0, 6, strNum[1] == "x" ? "off" : strNum[1], false); 
+          segment.setNumber(0, 5, strNum[2] == "x" ? "off" : strNum[2], false); 
+          segment.setNumber(0, 4, strNum[3] == "x" ? "off" : strNum[3], false); 
+          segment.setNumber(0, 3, strNum[4] == "x" ? "off" : strNum[4], false); 
+          segment.setNumber(0, 2, strNum[5] == "x" ? "off" : strNum[5], false); 
+          segment.setNumber(0, 1, strNum[6] == "x" ? "off" : strNum[6], false); 
+          segment.setNumber(0, 0, strNum[7] == "x" ? "off" : strNum[7], false); 
+          obniz.wait(5);
+        }
+        // light.red.off();
+        // speaker.stop();
+        // obniz.display.clear();
+        // obniz.display.print("OFF");
+        obniz.sleep
+      });
+    };
+  </script>
+</body>
+
+</html>
